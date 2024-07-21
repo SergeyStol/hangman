@@ -2,7 +2,7 @@ package dev.sstol.game;
 
 import dev.sstol.ui.CliInputOutput;
 import dev.sstol.ui.Painter;
-import dev.sstol.wordsstore.WordContainer;
+import dev.sstol.wordsstore.CurrentWordService;
 
 import java.util.regex.Pattern;
 
@@ -11,16 +11,16 @@ import java.util.regex.Pattern;
  * 2024-07-14
  */
 public class Game {
-   private final WordContainer wordContainer;
+   private final CurrentWordService currentWordService;
    private final CliInputOutput inputOutput;
    private final Painter painter;
    private final GameState gameState;
 
-   public Game(WordContainer wordContainer,
+   public Game(CurrentWordService currentWordService,
                CliInputOutput inputOutput,
                Painter painter,
                GameState gameState) {
-      this.wordContainer = wordContainer;
+      this.currentWordService = currentWordService;
       this.inputOutput = inputOutput;
       this.painter = painter;
       this.gameState = gameState;
@@ -31,9 +31,9 @@ public class Game {
       while (!quit) {
          this.gameState.reset();
          inputOutput.print("I made a word, try to guess it!");
-         wordContainer.nextRandomWord();
-         inputOutput.print(wordContainer.getOpenWord());
-         inputOutput.print(wordContainer.getMaskedWord());
+         currentWordService.nextRandomWord();
+         inputOutput.print(currentWordService.getOpenWord());
+         inputOutput.print(currentWordService.getMaskedWord());
 
          lap();
 
@@ -46,23 +46,23 @@ public class Game {
    private void lap() {
       while (gameState.inProgress()) {
          String letter = inputOutput.getLetter("Enter your letter: ", "Wrong input! Please, enter just one letter and press enter: ");
-         if (!wordContainer.unmaskLetters(letter)) {
+         if (!currentWordService.unmaskLetters(letter)) {
             gameState.lostLife();
             if (gameState.isLoose()) {
-               inputOutput.print("The right word is '" + wordContainer.getOpenWord() + "'");
+               inputOutput.print("The right word is '" + currentWordService.getOpenWord() + "'");
                inputOutput.print("You loose");
             }
             painter.drawHangman(gameState.getAmountLostLives());
          }
 
-         if (wordContainer.isWordUnmasked()) {
+         if (currentWordService.isWordUnmasked()) {
             gameState.setWinner();
-            inputOutput.print("The right word is '" + wordContainer.getOpenWord() + "'");
+            inputOutput.print("The right word is '" + currentWordService.getOpenWord() + "'");
             inputOutput.print("You win");
          }
 
          if (gameState.inProgress()) {
-            inputOutput.print(wordContainer.getMaskedWord());
+            inputOutput.print(currentWordService.getMaskedWord());
          }
       }
    }

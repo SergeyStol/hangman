@@ -1,14 +1,17 @@
 package dev.sstol;
 
-import dev.sstol.common.RandomGeneratorNumber;
+import dev.sstol.common.RandomNumberGenerator;
+import dev.sstol.common.RandomNumberGeneratorDefault;
 import dev.sstol.game.Game;
 import dev.sstol.game.GameState;
-import dev.sstol.httpclient.HttpClientService;
+import dev.sstol.httpclient.WordsHttpClient;
 import dev.sstol.ui.CliInputOutput;
 import dev.sstol.ui.Painter;
-import dev.sstol.wordsstore.WordContainer;
-import dev.sstol.wordsstore.WordsStoreService;
+import dev.sstol.wordsstore.CurrentWordService;
+import dev.sstol.wordsstore.WordsRepository;
+import dev.sstol.wordsstore.WordsService;
 
+import java.util.Random;
 import java.util.Scanner;
 
 public class HangmanMain {
@@ -20,17 +23,18 @@ public class HangmanMain {
       var inputOutput = new CliInputOutput(scanner);
       var gameState = new GameState(STARTED_LIVES);
       var painter = new Painter();
-      WordContainer wordContainer = getWordContainer();
-      var game = new Game(wordContainer, inputOutput, painter, gameState);
+      CurrentWordService currentWordService = getWordContainer();
+      var game = new Game(currentWordService, inputOutput, painter, gameState);
       game.run();
    }
 
-   private static WordContainer getWordContainer() {
-      var httpClientService = new HttpClientService(line -> line.length() > 4 && line.length() < 7);
-      String[] words = httpClientService.fetch();
+   private static CurrentWordService getWordContainer() {
+      var wordsHttpClient = new WordsHttpClient(line -> line.length() > 4 && line.length() < 7);
+      var wordsRepository = new WordsRepository(wordsHttpClient);
+      var random = new Random();
+      RandomNumberGenerator randomNumberGenerator = new RandomNumberGeneratorDefault(random);
+      var wordsService = new WordsService(wordsRepository, randomNumberGenerator);
 
-      var randomGeneratorNumber = new RandomGeneratorNumber();
-      var wordsStoreService = new WordsStoreService(words, randomGeneratorNumber);
-      return new WordContainer(wordsStoreService);
+      return new CurrentWordService(wordsService);
    }
 }

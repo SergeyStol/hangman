@@ -4,22 +4,20 @@ package dev.sstol.wordsstore;
  * @author Sergey Stol
  * 2024-07-14
  */
-public class WordContainer implements RandomWordsProvider {
-   private final RandomWordsProvider randomWordsProvider;
+public class CurrentWordService {
+   private final WordsService wordsService;
    private String word;
    private String maskedWord;
    private StringBuilder prevLetters = new StringBuilder();
 
-   public WordContainer(RandomWordsProvider randomWordsProvider) {
-      this.randomWordsProvider = randomWordsProvider;
+   public CurrentWordService(WordsService wordsService) {
+      this.wordsService = wordsService;
    }
 
-   @Override
-   public String nextRandomWord() {
-      this.word = randomWordsProvider.nextRandomWord();
+   public void nextRandomWord() {
+      this.word = wordsService.getRandomWord();
       this.maskedWord = convertToMaskedWord(this.word);
       this.prevLetters = new StringBuilder();
-      return this.word;
    }
 
    private String convertToMaskedWord(String word, String prevLetters) {

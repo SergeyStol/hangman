@@ -15,13 +15,13 @@ import java.util.logging.Logger;
  * @author Sergey Stol
  * 2024-07-13
  */
-public class HttpClientService {
-   private static final Logger log = Logger.getLogger(HttpClientService.class.getName());
+public class WordsHttpClient {
+   private static final Logger log = Logger.getLogger(WordsHttpClient.class.getName());
    private static final String ADDRESS = "https://gist.githubusercontent.com/kissarat/bd30c324439cee668f0ac76732d6c825/raw/147eecc9a86ec7f97f6dd442c2eda0641ddd78dc/russian-mnemonic-words.txt";
 
    private Predicate<String> predicate = (line) -> line.length() > 5 && line.length() < 9;
 
-   public HttpClientService(Predicate<String> predicate) {
+   public WordsHttpClient(Predicate<String> predicate) {
       this.predicate = predicate;
    }
 
@@ -38,7 +38,7 @@ public class HttpClientService {
       return new String[0];
    }
 
-   private static HttpResponse.BodyHandler<String[]> customBodyHandler(Predicate<String> predicate) {
+   private HttpResponse.BodyHandler<String[]> customBodyHandler(Predicate<String> predicate) {
       return responseInfo -> HttpResponse.BodySubscribers.mapping(
         HttpResponse.BodySubscribers.ofInputStream(),
         inputStream -> new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))
